@@ -57,6 +57,9 @@ kbd{display:inline-block;min-width:1.5em;padding:1px 6px;margin:0 2px;border:1px
 .spin{width:42px;height:42px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:var(--cyan);animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 
+/* vue cockpit : compteur dans le coin, le volant reste visible */
+body.cockpit #speedo{left:auto;right:16px;transform:scale(.55);transform-origin:right bottom}
+
 @media (max-width:700px){
   #speedo{transform:translateX(-50%) scale(.62);transform-origin:center bottom}
   #tank{transform:scale(.62);transform-origin:left bottom}

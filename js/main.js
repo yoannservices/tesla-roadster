@@ -115,7 +115,7 @@
     const k = e.key.toLowerCase();
     if (e.code === 'Escape' || k === 'p') openMenu(true);
     else if (k === 'r') respawn();
-    else if (k === 'c') { camMode = (camMode + 1) % 3; toast(['Caméra poursuite', 'Caméra éloignée', 'Vue cockpit'][camMode]); }
+    else if (k === 'c') { camMode = (camMode + 1) % 3; toast(['Caméra poursuite', 'Caméra éloignée', 'Vue cockpit'][camMode]); document.body.classList.toggle('cockpit', camMode === 2); }
     else if (k === 'l') { lightsForced = !lightsForced; toast(lightsForced ? 'Phares forcés' : 'Phares automatiques'); }
     else if (k === 'n') { timeOfDay = (timeOfDay + 6) % 24; toast('Heure : ' + fmtTime(timeOfDay)); }
     else if (k === 'h') $('help').classList.toggle('hide');

@@ -43,6 +43,15 @@ Ouvrez `index.html` dans un navigateur récent (Three.js est chargé depuis un C
 python -m http.server 8000
 ```
 
+## Fiche technique
+
+Résumé de ce que fait le code, tenu à jour à chaque modification : le lire suffit pour vérifier une information sans relire tout le jeu.
+
+- **Code** : `js/main.js` (boucle, caméras), `js/model.js`, `style.css` ; version des fichiers dans `index.html` (`style.css?v=15`, `main.js?v=18`) : à augmenter à chaque modification.
+- **Voiture** : `assets/models/tesla-roadster.glb` ; voitures de la ville `assets/models/npc/*.glb`.
+- **Caméras (C)** : poursuite, éloignée, cockpit. En cockpit la classe `body.cockpit` réduit le compteur (échelle 0,55) et le range en bas à droite pour ne pas cacher la route.
+- **Sauvegarde** : meilleure figure `roadster:bestTrick`.
+
 ## Crédits des modèles 3D
 
 Véhicules réels sous licence CC-BY (Sketchfab) : auteurs et licences dans `assets/models/CREDITS.md`.
