@@ -22,7 +22,9 @@
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
   // GPU intégré / logiciel : on démarre en mode performance
   const gpuName = (() => { try { const gl = renderer.getContext(), e = gl.getExtension('WEBGL_debug_renderer_info'); return e ? gl.getParameter(e.UNMASKED_RENDERER_WEBGL) : ''; } catch (e) { return ''; } })();
-  let hiQ = !/intel|swiftshader|llvmpipe|mali|adreno|powervr|apple gpu/i.test(gpuName);
+  // effets (halo lumineux, ombre 2048) seulement en qualité « Haut » des Réglages communs (assets/quality.js) et sur un vrai GPU
+  const qHaut = (m) => { try { return (m || JSON.parse(localStorage.getItem('site.quality.v2') || '{}').mode) === 'haut'; } catch (e) { return false; } };
+  let hiQ = qHaut() && !/intel|swiftshader|llvmpipe|mali|adreno|powervr|apple gpu/i.test(gpuName);
   const maxPR = () => hiQ ? Math.min(window.devicePixelRatio || 1, 1.5) : 1;
   let pixelRatio = maxPR();
   renderer.setPixelRatio(pixelRatio);
@@ -70,6 +72,7 @@
   const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.5, 0.92);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
+  renderer.hudView = { scene, camera };   // perf.js : la scène rendue dans le composer reçoit quand même les réglages de qualité communs
 
   // ---------- Monde ----------
   window.GameLoader.stage('Construction de la ville…');
@@ -879,11 +882,12 @@
   function applyQuality() {
     const sz = hiQ ? 2048 : 1024;
     if (sun.shadow.mapSize.x !== sz) { sun.shadow.mapSize.set(sz, sz); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
-    pixelRatio = maxPR(); resScale = 1;
+    pixelRatio = maxPR();
     renderer.setPixelRatio(pixelRatio); composer.setPixelRatio(pixelRatio);
     onResize();
     $('qbtn').textContent = hiQ ? 'Qualité : haute' : 'Qualité : performance';
   }
+  addEventListener('gamesettings', (e) => { const h = qHaut(e.detail.mode); if (h !== hiQ) { hiQ = h; applyQuality(); } });
   function openMenu(pause) {
     menuOpen = true; paused = true;
     $('menu').classList.remove('hide');
@@ -941,21 +945,8 @@
     updateHUD(dt);
     updateAudio();
     if (innerWidth < 2 || innerHeight < 2) return; // fenêtre réduite : rien à dessiner
-    if (hiQ) composer.render(); else renderer.render(scene, camera);
-    adaptResolution(dt);
-  }
-  // Résolution dynamique : vise ~50 images/s sur les petites cartes graphiques
-  let resScale = 1, frameAvg = 16, resT = 0;
-  function adaptResolution(dt) {
-    if (paused || document.hidden) return;
-    frameAvg = lerp(frameAvg, dt * 1000, 0.05);
-    resT += dt;
-    if (resT < 1.2) return;
-    resT = 0;
-    let ns = resScale;
-    if (frameAvg > 22 && resScale > 0.55) ns = Math.max(0.55, resScale - 0.1);
-    else if (frameAvg < 14 && resScale < 1) ns = Math.min(1, resScale + 0.05);
-    if (ns !== resScale) { resScale = ns; const pr = maxPR() * resScale; renderer.setPixelRatio(pr); composer.setPixelRatio(pr); onResize(); }
+    // effets : le composer suit la résolution du renderer, que la résolution adaptative commune (assets/perf.js) fait varier
+    if (hiQ) { const pr = renderer.getPixelRatio(); if (composer._pixelRatio !== pr) composer.setPixelRatio(pr); composer.render(); } else renderer.render(scene, camera);
   }
   requestAnimationFrame(frame);
   window.GameLoader.ready();

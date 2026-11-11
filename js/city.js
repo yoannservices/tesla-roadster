@@ -204,6 +204,34 @@ window.buildCity = function (THREE, mergeGeometries, renderer, scene) {
   const stuntMeshes = new THREE.Group();
   scene.add(stuntMeshes);
 
+  // ---------- Bâtiments : kit commun assets/building-kit.js ----------
+  // Relief limité (cadres, appuis, bandeaux de quelques cm ; ni balcons, ni stores, ni auvents) : la voiture roule sur les murs,
+  // dont la collision reste le pavé plein (colBox). Acrotère bas (25 cm) pour pouvoir rouler sur les toits.
+  const BK = BuildingKit(THREE), kcity = BK.lodCity(200);   // par zones : détaillé de près, simplifié au loin
+  const KM = BK.materials({ style: 'concrete', glass: '#4c6a86', roof: 'gravel' });
+  [{ style: 'concrete', wall: '#9aaabb' }, { style: 'stone', wall: '#cfc5b3' }, { style: 'brick', wall: '#a8634c' }, { style: 'concrete', wall: '#44484e' }]
+    .forEach((o, k) => { KM['wall_' + k] = BK.materials(o).wall; });
+  KM.frame_dark = BK.materials({ frame: '#30363e' }).frame;
+  facadeMats.push(KM.lit, KM.shop);
+  const KOPT = [
+    { facade: 'curtain', fh: 3.6, gfh: 4.5, cell: 2 },
+    { facade: 'ribbon', fh: 3.5, shop: true, door: '-z', doorType: 'block' },
+    { fh: 3.2, shop: true, door: '-z', doorType: 'block', win: [1.3, 1.6], detail: 1 },
+    { facade: 'ribbon', fh: 3.6, door: '+z', doorType: 'block' },
+  ];
+  // côté le plus proche d'une rue (lignes de rue tous les PITCH m) -> façade principale
+  const nearRoad = (v) => { const k = Math.round((v + HALF) / PITCH); return -HALF + k * PITCH; };
+  function kitBox(x0, y0, z0, x1, y1, z1, style, col, ground) {
+    colBox(x0, y0, z0, x1, y1, z1);
+    if (!ground) y0 += 0.1;   // gradin posé sur la dalle du niveau inférieur (0,1 m au-dessus du sommet du pavé)
+    const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+    const side = [[Math.abs(nearRoad(x0) - x0), -1, 0], [Math.abs(nearRoad(x1) - x1), 1, 0], [Math.abs(nearRoad(z0) - z0), 0, -1], [Math.abs(nearRoad(z1) - z1), 0, 1]].sort((a, b) => a[0] - b[0])[0];
+    const q = side[1] !== 0;
+    const keys = { wall: 'wall_' + style, frame: style === 0 || style === 3 ? 'frame_dark' : 'frame' };
+    const o = ground ? KOPT[style] : { ...KOPT[style], shop: false, door: false, lobby: false, gfh: KOPT[style].fh, plinth: false };
+    kcity.building(cx, y0, cz, Math.atan2(side[1], side[2]), { w: q ? z1 - z0 : x1 - x0, d: q ? x1 - x0 : z1 - z0, h: y1 - y0, roof: 'flat', parapet: 0.25, equip: false, balcony: false, awning: false, canopy: false, rand: R, tint: col, ...o }, keys);
+  }
+
   // ---------- Bâtiments ----------
   const tints = [
     [[0.85, 0.95, 1.1], [0.75, 0.85, 1.0], [0.95, 1.0, 1.05]],
@@ -216,7 +244,7 @@ window.buildCity = function (THREE, mergeGeometries, renderer, scene) {
     const col = new THREE.Color(tl[0], tl[1], tl[2]);
     const offU = Math.floor(R() * 8), offV = 0;
     let top = y0 + h;
-    boxInto(facadeGB[style], roofGB, x0, y0, z0, x1, top, z1, { tile: TILE, col, offU, v0: y0 - offV * TILE, topTile: 8 });
+    kitBox(x0, y0, z0, x1, top, z1, style, col, true);
     // gradins pour les tours
     let bx0 = x0, bz0 = z0, bx1 = x1, bz1 = z1;
     if (!noTiers && h > 55 && R() < 0.55) {
@@ -226,7 +254,7 @@ window.buildCity = function (THREE, mergeGeometries, renderer, scene) {
         if (bx1 - bx0 < 2 * ins + 8 || bz1 - bz0 < 2 * ins + 8) break;
         bx0 += ins; bz0 += ins; bx1 -= ins; bz1 -= ins;
         const th = 10 + R() * h * 0.35;
-        boxInto(facadeGB[style], roofGB, bx0, top, bz0, bx1, top + th, bz1, { tile: TILE, col, offU: offU + 3, v0: y0, topTile: 8 });
+        kitBox(bx0, top, bz0, bx1, top + th, bz1, style, col, false);
         top += th;
       }
     }
@@ -485,8 +513,8 @@ window.buildCity = function (THREE, mergeGeometries, renderer, scene) {
       const t = 22;
       building(cx - t, cz - t, cx + t, cz + t, 175, 0, true);
       // couronne de la tour signal
-      boxInto(facadeGB[3], roofGB, cx - t + 6, CURB + 175, cz - t + 6, cx + t - 6, CURB + 225, cz + t - 6, { tile: TILE, v0: CURB });
-      boxInto(facadeGB[0], roofGB, cx - 9, CURB + 225, cz - 9, cx + 9, CURB + 262, cz + 9, { tile: TILE, v0: CURB });
+      kitBox(cx - t + 6, CURB + 175, cz - t + 6, cx + t - 6, CURB + 225, cz + t - 6, 3, null, false);
+      kitBox(cx - 9, CURB + 225, cz - 9, cx + 9, CURB + 262, cz + 9, 0, null, false);
       inst.antenna.push([cx, CURB + 262, cz, 40]);
       inst.aviation.push([cx, CURB + 302, cz]);
       mapItems.tower = [cx, cz];
@@ -591,7 +619,7 @@ window.buildCity = function (THREE, mergeGeometries, renderer, scene) {
 
   // ---------- Maillages fusionnés ----------
   const addGB = (gb, mat, cast = true) => { const m = new THREE.Mesh(gb.build(), mat); m.castShadow = cast; m.receiveShadow = true; scene.add(m); return m; };
-  facadeGB.forEach((gb, s) => addGB(gb, facadeMats[s]));
+  scene.add(kcity.group(KM));
   addGB(roofGB, roofMat);
   addGB(slabSideGB, sidewalkMat, false);
   addGB(slabTopGB, sidewalkMat, false);
