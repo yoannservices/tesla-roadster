@@ -2,12 +2,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="assets/theme.css" />
-<link rel="stylesheet" href="assets/simulateur.css" />
-<script src="assets/loader.js" data-name="Tesla Roadster" data-driving="tesla-roadster" data-menu="#menu .in" data-menu-hide=".kicker|h1|.lead|.keys|.note|.row" data-description="Supercar électrique : roule sur les murs, décolle et enchaîne les figures en ville." data-controls="# Touches de base|Z S Q D / flèches : conduire|C : caméra|R : départ|Échap : pause|# Touches du jeu|Maj : boost|Espace : décoller|En l’air Z / S : piquer ou cabrer|Q / D : pivoter · A / E : tonneaux|H : aide|Manette : RT gaz · LT frein · stick gauche direction · stick droit caméra (en l'air : tonneau) · A propulseurs · RB boost · B phares · Y caméra · X recommencer · croix droite +6 h · croix haut temps accéléré · Start pause" data-preload="../../assets/models/tesla-roadster.glb|../../assets/models/npc/car-compact.glb|../../assets/models/npc/car-coupe.glb|../../assets/models/npc/car-hatchback.glb|../../assets/models/npc/car-minivan.glb|../../assets/models/npc/car-offroad.glb|../../assets/models/npc/car-pickup.glb|../../assets/models/npc/car-sedan.glb|../../assets/models/npc/car-sport.glb|../../assets/models/npc/car-suv.glb|../../assets/models/npc/car-wagon.glb|../../assets/models/npc/veh-taxi.glb|../../assets/models/npc/veh-police_sedan.glb|../../assets/models/npc/veh-postvan.glb"></script>
-<script src="assets/driving-base.js"></script>
-<script src="assets/site.js" data-project="loisirs/tesla-roadster/index.html"></script>
-<script src="assets/gamepad.js" data-profile="tesla"></script>
+<link rel="stylesheet" href="./assets/theme.css" />
+<link rel="stylesheet" href="./assets/simulateur.css" />
+<script src="./assets/loader.js" data-name="Tesla Roadster" data-driving="tesla-roadster" data-menu="#menu .in" data-menu-hide=".kicker|h1|.lead|.keys|.note|.row" data-description="Supercar électrique : roule sur les murs, décolle et enchaîne les figures en ville." data-controls="# Touches de base|Z S Q D / flèches : conduire|C : caméra|R : départ|Échap : pause|# Touches du jeu|Maj : boost|Espace : décoller|En l’air Z / S : piquer ou cabrer|Q / D : pivoter · A / E : tonneaux|H : aide|Manette : RT gaz · LT frein · stick gauche direction · stick droit caméra (en l'air : tonneau) · A propulseurs · RB boost · B phares · Y caméra · X recommencer · croix droite +6 h · croix haut temps accéléré · Start pause" data-preload="../../assets/models/tesla-roadster.glb|../../assets/models/npc/car-compact.glb|../../assets/models/npc/car-coupe.glb|../../assets/models/npc/car-hatchback.glb|../../assets/models/npc/car-minivan.glb|../../assets/models/npc/car-offroad.glb|../../assets/models/npc/car-pickup.glb|../../assets/models/npc/car-sedan.glb|../../assets/models/npc/car-sport.glb|../../assets/models/npc/car-suv.glb|../../assets/models/npc/car-wagon.glb|../../assets/models/npc/veh-taxi.glb|../../assets/models/npc/veh-police_sedan.glb|../../assets/models/npc/veh-postvan.glb"></script>
+<script src="./assets/driving-base.js"></script>
+<script src="./assets/site.js" data-project="loisirs/tesla-roadster/index.html"></script>
+<script src="./assets/gamepad.js" data-profile="tesla"></script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Roadster Simulator</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -20,7 +20,7 @@
   "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.6/build/index.module.js"
 } }
 </script>
-<script type="module">import { patch } from "assets/perf.js"; import * as T from "three"; patch(T);</script>
+<script type="module">import { patch } from "./assets/perf.js"; import * as T from "three"; patch(T);</script>
 </head><body>
 <canvas id="c"></canvas>
 
@@ -82,7 +82,7 @@
 </div>
 
 <script src="js/model.js?v=17"></script>
-<script src="assets/building-kit.js?v=2"></script>
+<script src="./assets/building-kit.js?v=2"></script>
 <script src="js/city.js?v=15"></script>
 <script src="js/hud.js?v=12"></script>
 <script src="js/main.js?v=18"></script>
